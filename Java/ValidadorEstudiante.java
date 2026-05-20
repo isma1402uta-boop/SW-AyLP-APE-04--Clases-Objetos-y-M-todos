@@ -1,15 +1,23 @@
+import java.util.Scanner;
+
 public class ValidadorEstudiante {
+    // Atributo privado único para el manejo de la consola (Evita fugas de memoria)
+    private final Scanner sc;
 
-    public ValidadorEstudiante() {}
+    // Constructor que inicializa el lector de forma segura
+    public ValidadorEstudiante() {
+        this.sc = new Scanner(System.in);
+    }
 
+    // Algoritmo de validación del Registro Civil (Módulo 10)
     private boolean esCedulaRealEcuatoriana(String cedula) {
-        // 1. Código de provincia
+        // 1. Código de provincia (01 a 24, o 30 para ecuatorianos en el exterior)
         int provincia = Integer.parseInt(cedula.substring(0, 2));
         if ((provincia < 1 || provincia > 24) && provincia != 30) {
             return false;
         }
 
-        // 2. Tercer dígito menor a 6
+        // 2. Tercer dígito menor a 6 (Cédulas de personas naturales)
         int tercerDigito = Character.getNumericValue(cedula.charAt(2));
         if (tercerDigito >= 6) {
             return false;
@@ -33,8 +41,8 @@ public class ValidadorEstudiante {
         return digitoVerificadorCalculado == digitoVerificadorReal;
     }
 
-    public String validarCedula(String mensaje, LectorDatos lector) {
-        java.util.Scanner sc = new java.util.Scanner(System.in);
+    // CORRECCIÓN: Se removió el parámetro LectorDatos innecesario y se usa el 'sc' global
+    public String validarCedula(String mensaje) {
         while (true) {
             System.out.print(mensaje);
             String cedula = sc.nextLine().trim();
@@ -52,7 +60,6 @@ public class ValidadorEstudiante {
     }
 
     public String validarTexto(String mensaje) {
-        java.util.Scanner sc = new java.util.Scanner(System.in);
         while (true) {
             System.out.print(mensaje);
             String texto = sc.nextLine();
@@ -66,7 +73,7 @@ public class ValidadorEstudiante {
             for (int i = 0; i < texto.length(); i++) {
                 char c = texto.charAt(i);
                 
-                // En Java, Character.isLetter reconoce automáticamente tildes y la 'ñ' / 'Ñ'
+                // Reconoce de manera nativa tildes, diéresis y la Ñ
                 if (Character.isLetter(c) || Character.isWhitespace(c)) {
                     continue;
                 }
@@ -77,7 +84,7 @@ public class ValidadorEstudiante {
             if (!caracteresValidos) {
                 System.out.println("-> [ERROR] El campo solo debe contener letras y espacios (sin numeros ni simbolos).");
             } else {
-                return texto;
+                return texto.trim(); // Retorna el texto limpio de espacios innecesarios a los lados
             }
         }
     }

@@ -9,8 +9,8 @@ public class Main {
     public static void main(String[] args) {
         LectorDatos lector = new LectorDatos();
         ValidadorEstudiante validadorEst = new ValidadorEstudiante();
-        
-        // ArrayList reemplaza a std::vector de C++
+
+        // ArrayList dinámico para el almacenamiento en memoria RAM
         ArrayList<Estudiante> listaEstudiantes = new ArrayList<>();
 
         int opcion;
@@ -22,7 +22,7 @@ public class Main {
             System.out.println("2. Mostrar Listado Completo y Estadisticas de Notas");
             System.out.println("3. Salir del Sistema");
             System.out.println("----------------------------------------------------");
-            
+
             opcion = lector.validarEntero("Seleccione una opcion: ");
             System.out.println();
 
@@ -31,59 +31,65 @@ public class Main {
                     System.out.println("=== REGISTRO DE NUEVOS ESTUDIANTES ===");
                     System.out.println("Estudiantes registrados actualmente: " + listaEstudiantes.size());
                     int cantidad = lector.validarEntero("Cual es la cantidad de estudiantes a registrar ahora?: ");
-                    
-                    // En Java, el ArrayList gestiona su memoria de forma dinámica excelente por sí solo,
-                    // pero podemos usar ensureCapacity para lograr la misma alta eficiencia que 'reserve' en C++
+
+                    // Alta eficiencia: Reserva espacio contiguo inicial en la colección
                     listaEstudiantes.ensureCapacity(listaEstudiantes.size() + cantidad);
 
                     for (int i = 0; i < cantidad; i++) {
                         System.out.println("\n--- REGISTRANDO ESTUDIANTE #" + (i + 1) + " DE " + cantidad + " ---");
-                        
-                        String cedula = validadorEst.validarCedula("Ingrese el numero de cedula: ", lector);
+
+                        // 🔥 CORREGIDO: Se removió ', lector' para que coincida con tu
+                        // ValidadorEstudiante
+                        String cedula = validadorEst.validarCedula("Ingrese el numero de cedula: ");
                         String nombre = validadorEst.validarTexto("Ingrese los nombres: ");
                         String apellido = validadorEst.validarTexto("Ingrese los apellidos: ");
-                        
+
                         float n1 = lector.validarNota("Ingrese la Nota del Parcial 1 (0.00 - 10.00): ");
                         float n2 = lector.validarNota("Ingrese la Nota del Parcial 2 (0.00 - 10.00): ");
                         float n3 = lector.validarNota("Ingrese la Nota del Parcial 3 (0.00 - 10.00): ");
 
+                        // Instanciación y cálculo interno automático del promedio
                         Estudiante nuevoAlumno = new Estudiante(cedula, nombre, apellido, n1, n2, n3);
-                        listaEstudiantes.add(nuevoAlumno); // .add() reemplaza a .push_back()
-                        System.out.println("-> [EXITO] Estudiante almacenado correctamente.");
-                    
+                        listaEstudiantes.add(nuevoAlumno);
+                        System.out.println("-> [EXITO] Estudiante almacenado correctamente en memoria.");
+
+                        // Módulo de persistencia física de datos (Modo Append activo)
                         try (FileWriter fw = new FileWriter("registro_notas.csv", true);
-                             PrintWriter escritor = new PrintWriter(fw)) {
-                            
-                            // Escribimos los datos en formato CSV (separados por comas)
-                            escritor.println(cedula + "," 
-                                           + apellido + " " + nombre + "," 
-                                           + n1 + "," + n2 + "," + n3 + "," 
-                                           + nuevoAlumno.getPromedio() + "," 
-                                           + (nuevoAlumno.determinarAprobacion() ? "APROBADO" : "REPROBADO"));
-                            
+                                PrintWriter escritor = new PrintWriter(fw)) {
+
+                            // Formato CSV estructurado por comas para compatibilidad inmediata con MS Excel
+                            escritor.println(cedula + ","
+                                    + apellido + " " + nombre + ","
+                                    + n1 + "," + n2 + "," + n3 + ","
+                                    + nuevoAlumno.getPromedio() + ","
+                                    + (nuevoAlumno.determinarAprobacion() ? "APROBADO" : "REPROBADO"));
+
                             System.out.println("-> [EXITO] Respaldo guardado fisicamente en 'registro_notas.csv'.");
-                            
+
                         } catch (IOException e) {
-                            // Si ocurre un error de hardware (disco lleno, sin permisos, etc.) Java lo captura aquí
-                            System.out.println("-> [ERROR CRITICO] No se pudo acceder al disco duro: " + e.getMessage());
+                            System.out
+                                    .println("-> [ERROR CRITICO] No se pudo acceder al disco duro: " + e.getMessage());
                         }
                     }
                     break;
 
                 case 2:
-                    // Se mantiene el mismo "escudo" flexible que diseñamos para tus parciales
+                    // Escudo de control de tamaño mínimo flexible solicitado por la guía
                     if (listaEstudiantes.size() < MIN_ESTUDIANTES) {
-                        System.out.println("-> [ERROR] No se puede mostrar el reporte. El sistema exige un minimo global de " + MIN_ESTUDIANTES + " estudiantes.");
-                        System.out.println("   Actualmente solo hay " + listaEstudiantes.size() + " estudiantes registrados.");
+                        System.out.println(
+                                "-> [ERROR] No se puede mostrar el reporte. El sistema exige un minimo global de "
+                                        + MIN_ESTUDIANTES + " estudiantes.");
+                        System.out.println(
+                                "   Actualmente solo hay " + listaEstudiantes.size() + " estudiantes registrados.");
                     } else {
                         System.out.println("====================================================");
                         System.out.println("        REQUERIMIENTO 4: LISTADO DE ESTUDIANTES     ");
                         System.out.println("====================================================");
-                        
+
                         int totalAprobados = 0;
                         int totalReprobados = 0;
 
-                        // Bucle optimizado para colecciones en Java (For-each)
+                        // Bucle optimizado de lectura secuencial rápida (For-each)
                         for (Estudiante est : listaEstudiantes) {
                             est.mostrarInformacion();
                             if (est.determinarAprobacion()) {
