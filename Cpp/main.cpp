@@ -3,6 +3,7 @@
 #include "Estudiantes.h"          // Estructura y lógica del alumno
 #include "validadorEstudiante.h" // Validación de cédula real, nombres y apellidos
 #include "validarNotas.h"         // Clase encargada de validar números y rangos de notas
+#include <fstream>                // Librería para manejo de archivos
 
 using namespace std;
 
@@ -67,6 +68,23 @@ int main() {
                     // Almacenamiento eficiente de O(1) gracias a la reserva previa de memoria
                     listaEstudiantes.push_back(nuevoAlumno);
                     cout << "-> [EXITO] Estudiante almacenado correctamente.\n";
+
+                    // Abrimos (o creamos) el archivo en modo 'app' (append = añadir al final)
+                    ofstream archivoBackup("registro_notas.csv", ios::app);
+    
+                    if (archivoBackup.is_open()) {
+                        // Guardamos los datos separados por comas para que sea compatible con Excel
+                        archivoBackup << cedula << "," 
+                                      << apellido << " " << nombre << "," 
+                                      << n1 << "," << n2 << "," << n3 << "," 
+                                      << nuevoAlumno.getPromedio() << "," 
+                                      << (nuevoAlumno.determinarAprobacion() ? "APROBADO" : "REPROBADO") << "\n";
+        
+                        archivoBackup.close(); // Siempre es vital cerrar el archivo para liberar la memoria
+                        cout << "-> [EXITO] Respaldo guardado fisicamente en 'registro_notas.csv'.\n";
+                    } else {
+                        cout << "-> [ERROR CRITICO] No se pudo acceder al disco para guardar el archivo.\n";
+                    }
                 }
                 break;
             }
