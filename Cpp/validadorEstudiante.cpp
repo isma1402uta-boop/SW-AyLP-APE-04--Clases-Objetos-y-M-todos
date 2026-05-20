@@ -8,7 +8,6 @@ using namespace std;
 // Constructor
 ValidadorEstudiante::ValidadorEstudiante() {}
 
-
 // MÉTODO PRIVADO: Algoritmo matemático del Registro Civil de Ecuador
 bool ValidadorEstudiante::esCedulaRealEcuatoriana(const string& cedula) {
     
@@ -45,7 +44,6 @@ bool ValidadorEstudiante::esCedulaRealEcuatoriana(const string& cedula) {
 }
 
 
-
 // MÉTODO PÚBLICO: Captura y blindaje de Cédula en consola
 string ValidadorEstudiante::validarCedula(const string& mensaje) {
     string cedula;
@@ -74,7 +72,6 @@ string ValidadorEstudiante::validarCedula(const string& mensaje) {
     }
 }
 
-
 // MÉTODO PÚBLICO: Captura de Nombres y Apellidos en español
 string ValidadorEstudiante::validarTexto(const string& mensaje) {
     string texto;
@@ -94,16 +91,9 @@ string ValidadorEstudiante::validarTexto(const string& mensaje) {
         for (size_t i = 0; i < texto.length(); i++) {
             char c = texto[i];
             
-            // Si es un carácter alfabético estándar en inglés o un espacio, avanza
-            if (isalpha(c) || isspace(c)) {
+            // OPTIMIZADO: Si es letra estándar, espacio o un carácter extendido (tildes/ñ donde c < 0)
+            if (isalpha(c) || isspace(c) || c < 0) {
                 continue;
-            }
-            
-            // Excepciones nativas añadidas para la gramática hispana (tildes y diéresis)
-            if (c == 'ñ' || c == 'Ñ' || 
-                c == 'á' || c == 'é' || c == 'í' || c == 'ó' || c == 'ú' ||
-                c == 'Á' || c == 'É' || c == 'Í' || c == 'Ó' || c == 'Ú') {
-                continue; 
             }
             
             // Si encuentra un número o símbolo no autorizado, levanta la bandera de error
